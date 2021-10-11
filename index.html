@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Player</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="player.css">
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.1/firebase-firestore.js"></script>
+
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBGZEtZ1-U1Sa3n0UsqxhaqNkdu16t-hMU",
+        authDomain: "simabot-75622.firebaseapp.com",
+        databaseURL: "https://simabot-75622-default-rtdb.firebaseio.com",
+        projectId: "simabot-75622",
+        storageBucket: "simabot-75622.appspot.com",
+        messagingSenderId: "724453591705",
+        appId: "1:724453591705:web:7cc29ed7054914101bc608"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
+  </head>
+  <body>
+    <h1 id="webpagetitle">📻Radio</h1>
+    <div id="radio">
+      <div class="left">
+        <h1 id="title"></h1>
+        <h2 id="author"></h2>
+        <h3 id="time"></h3>
+        <pre>
+        Если вы хотите слушать радио, нажмите на картинку.
+        If you want listen radio, click on image.
+
+        Также радио можно слушать в Discord.
+        You can listen radio in Discord.
+
+        Не всю музыку можно слушать тут.
+        You can't listen all music, use Discord.
+        </pre>
+        <button type="button" name="button" id="control"></button>
+      </div>
+      <div class="right">
+        <div id="ytpel">
+          <div id="ytp"></div>
+        </div>
+        <!-- <iframe width="560" height="315" id="playeryt" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe> -->
+        <img id="thumbnail" style="display: none;">
+      </div>
+    </div>
+    <script src="player.js" charset="utf-8"></script>
+  </body>
+</html>
