@@ -31,11 +31,9 @@ function onPlayerReady(event) {
 }
 function onPlayerStateChange(e) {
   if (e.data == -1) {
-    console.log('N');
     ytpel.style.display = 'none';
     thumbnail.style.display = 'block';
   }else{
-    console.log('B');
     ytpel.style.display = 'block';
     thumbnail.style.display = 'none';
   }
@@ -79,6 +77,9 @@ function sync() {
     player.seekTo(Math.floor(t()));
   }
 }
+volume.oninput = function () {
+  player.setVolume(this.value);
+}
 function handleInfo() {
   db.collection("radio").doc("radio")
     .onSnapshot((doc) => {
@@ -90,7 +91,7 @@ function handleInfo() {
             thumbnail.src = data.thumbnail;
           }
           timestampradio = data.timestamp;
-          webpagetitle.innerText = '📻Radio v' +  data.version;
+          webpagetitle.innerText = '📻Radio powered ⚡ with SimaBot v' +  data.version;
           duration_song = data.time;
           const videoId = new URL(data.url).searchParams.get('v');
           window.cPlays = videoId;
@@ -100,7 +101,6 @@ function handleInfo() {
               sync();
             }
           }
-          // playeryt.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&controls=0&disablekb=1&showinfo=0&rel=0&modestbranding=1&enablejsapi=1';
         }
     });
 }
@@ -132,12 +132,12 @@ function init() {
       n = true;
     }
     if(n){
-      control.innerText = '🔇 Выкл. звук/Mute';
+      control.innerText = '🔇';
       if(player){
         player.unMute();
       }
     }else{
-      control.innerText = '🔊 Вкл. звук/Unmute';
+      control.innerText = '🔊';
       if(player){
         player.mute();
       }

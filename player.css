@@ -1,44 +1,91 @@
 *{
   font-family: 'Roboto', sans-serif;
   color: #fff;
-  font-size: large;
+  font-size: %200;
 }
-.left{
-  width: 50%;
+body{
+  margin: 0;
 }
-.right{
-  width: 50%;
+/* From https://www.w3schools.com/howto/howto_js_rangeslider.asp */
+.slider {
+  -webkit-appearance: none;  /* Override default CSS styles */
+  appearance: none;
+  width: 80%; /* Full-width */
+  height: 25px; /* Specified height */
+  background: #d3d3d3; /* Grey background */
+  outline: none; /* Remove outline */
+  opacity: 0.7; /* Set transparency (for mouse-over effects on hover) */
+  -webkit-transition: .2s; /* 0.2 seconds transition on hover */
+  transition: opacity .2s;
+  border-radius: 100px;
 }
-#thumbnail, iframe{
-  margin-left: 10px;
-  width: calc(100% - 10px);
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+/* Mouse-over effects */
+.slider:hover {
+  opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider::-moz-range-thumb, .slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none; /* Override default look */
+  width: 60px; /* Set a specific slider handle width */
+  height: 60px; /* Slider handle height */
+  background: #04AA6D; /* Green background */
+  cursor: pointer; /* Cursor on hover */
+  border-radius: 100px;
+}
+/* END */
+.up, .down{
+  width: 98%;
+  position: absolute;
+  left: 0;
+}
+.up{
+  top: 0;
+}
+.down{
+  bottom: 0;
+}
+#radio{
+  width: 90%;
+}
+#yt{
+  position: absolute;
+  left: 0;
+  background: #fff;
+  z-index: -1;
+}
+#yt *, #yt{
+  height: 100%;
+  width: 100%;
   pointer-events: none;
 }
-#webpagetitle{
+.up, .down{
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
   text-align: center;
-  color: #000;
-  background: #fff;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  border-radius:  10px;
+  border-radius: 1000px;
+  margin: 1%;
+}
+#up, #down{
+  height: 50%;
+}
+#radio{
+  margin-left: 5%;
 }
 body, html{
   overflow: hidden;
 }
-#radio, button{
-  background: linear-gradient(90deg, rgba(0,255,72,1) 0%, rgba(9,121,65,1) 100%);
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  margin: 10px;
-  display: flex;
-}
-button{
-  transition: background .3s;
-  border: 5px outset #00A448;
-}
-button:hover{
+#control{
+  background: #000;
+  border: none;
+  padding: 0.8% 1%;
+  font-size: 200%;
+  border-radius: 1000px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  transition: .3s background;
   cursor: pointer;
+}
+#control:hover{
   color: #000;
   background: #fff;
 }
