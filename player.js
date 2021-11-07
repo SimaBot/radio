@@ -31,10 +31,10 @@ function onPlayerReady(event) {
 }
 function onPlayerStateChange(e) {
   if (e.data == -1) {
-    ytpel.style.display = 'none';
+    ytp.style.display = 'none';
     thumbnail.style.display = 'block';
   }else{
-    ytpel.style.display = 'block';
+    ytp.style.display = 'block';
     thumbnail.style.display = 'none';
   }
   try {
