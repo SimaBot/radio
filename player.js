@@ -1,7 +1,33 @@
-var db = firebase.firestore();
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js';
+import { doc, getDoc, getFirestore, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.3.0/firebase-firestore.js';
+
+var firebaseConfig = {
+  apiKey: "AIzaSyBGZEtZ1-U1Sa3n0UsqxhaqNkdu16t-hMU",
+  authDomain: "simabot-75622.firebaseapp.com",
+  databaseURL: "https://simabot-75622-default-rtdb.firebaseio.com",
+  projectId: "simabot-75622",
+  storageBucket: "simabot-75622.appspot.com",
+  messagingSenderId: "724453591705",
+  appId: "1:724453591705:web:7cc29ed7054914101bc608"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const radioRef = doc(db, 'radio', 'radio');
+
 var duration_song = 0;
 var timestampradio = utcTimestamp();
-window.cPlays = '';
+var player;
+
+var e = document.body.getElementsByTagName("*");
+var i = 0;
+for (var i = 0; i < e.length; i++) {
+  if(e[i].id != ""){
+    const t = e[i].id;
+    window[t] = document.getElementById(t);
+  }
+}
+// DOM
 
 function toHHMMSS(e) {
     var sec_num = parseInt(e, 10); // don't forget the second param
@@ -20,46 +46,22 @@ function toHHMMSS(e) {
     return out;
 }
 
-var player;
-
-function onPlayerReady(event) {
-  try {
-    event.target.playVideo();
-  } catch (e) {
-
+volume.oninput = function () {
+  if(player){
+    player.setVolume(this.value);
   }
 }
-function onPlayerStateChange(e) {
-  if (e.data == -1) {
-    ytp.style.display = 'none';
-    thumbnail.style.display = 'block';
+function btnControl() {
+  if(!player){
+    return;
+  }
+  var n = player.isMuted() || true;
+  if(n){
+    control.innerText = '🔇';
+    player.unMute();
   }else{
-    ytp.style.display = 'block';
-    thumbnail.style.display = 'none';
-  }
-  try {
-    player.playVideo();
-  } catch (e) {
-
-  }
-  firstPlay();
-}
-function firstPlay() {
-  if(player.getVideoUrl() == 'https://www.youtube.com/watch'){
-    player.loadVideoById(window.cPlays);
-  }
-}
-function onYouTubeIframeAPIReady() {
-  player = new YT.Player('ytp', {
-    videoId: window.cPlays,
-    events: {
-      'onReady': onPlayerReady,
-      'onStateChange': onPlayerStateChange
-    }
-  });
-  window.onclick = function (e) {
-    player.playVideo();
-    sync();
+    control.innerText = '🔊';
+    player.mute();
   }
 }
 
@@ -68,86 +70,68 @@ function utcTimestamp() {
   return Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
 }
 
+function handleInfo(doc) {
+  const data = JSON.parse(doc.data().info);
+  if(data.title == 'undefined'){
+    return;
+  }
+  title.innerText = data.title;
+  author.innerText = data.author;
+  if(thumbnail.src != data.thumbnail){
+    thumbnail.src = data.thumbnail;
+  }
+  timestampradio = data.timestamp;
+  webpagetitle.innerText = '📻Radio v3 powered ⚡ with SimaBot v' +  data.version;
+  duration_song = data.time;
+  const videoId = new URL(data.url).searchParams.get('v');
+  player.loadVideoById(videoId);
+  player.seekTo(Math.floor(t()));
+}
+
+// Optimized code ended
+
+function onPlay(e) {
+  if (e.data != 1) {
+    yt.className = 'novideo';
+  }else{
+    yt.className = 'video';
+  }
+  if(player){
+    player.playVideo();
+  }
+}
+
+window.onYouTubeIframeAPIReady = function () {
+  player = new YT.Player('ytp', {
+    events: {
+      'onReady': onPlay,
+      'onStateChange': onPlay
+    }
+  });
+}
+
 function t() {
   return (utcTimestamp() - timestampradio) / 1000;
 }
 
-function sync() {
-  if(player){
-    player.seekTo(Math.floor(t()));
-  }
-}
-volume.oninput = function () {
-  player.setVolume(this.value);
-}
-function handleInfo() {
-  db.collection("radio").doc("radio")
-    .onSnapshot((doc) => {
-        const data = JSON.parse(doc.data().info);
-        if(data.title != 'undefined'){
-          title.innerText = data.title;
-          author.innerText = data.author;
-          if(thumbnail.src != data.thumbnail){
-            thumbnail.src = data.thumbnail;
-          }
-          timestampradio = data.timestamp;
-          webpagetitle.innerText = '📻Radio powered ⚡ with SimaBot v' +  data.version;
-          duration_song = data.time;
-          const videoId = new URL(data.url).searchParams.get('v');
-          window.cPlays = videoId;
-          if(player){
-            if(typeof player.loadVideoById != 'undefined'){
-              player.loadVideoById(videoId);
-              sync();
-            }
-          }
-        }
-    });
-}
-includeIdE = function(){
-  var e = document.body.getElementsByTagName("*");
-  var i = 0;
-  for (var i = 0; i < e.length; i++) {
-    if(e[i].id != ""){
-      const t = e[i].id;
-      window[t] = document.getElementById(t);
-    }
-  }
-}
 function setTimeElement() {
   time.innerText = '⌛' + toHHMMSS(Number(duration_song)) + ' / ' + toHHMMSS(Math.floor(t()));
 }
+
 function init() {
   var tag = document.createElement('script');
+  start.onclick = function () {
+    start.onclick = null;
+    start.className = 'hide';
+    getDoc(radioRef).then(handleInfo);
+    onSnapshot(radioRef, handleInfo);
+  }
   tag.src = "https://www.youtube.com/iframe_api";
   var firstScriptTag = document.getElementsByTagName('script')[0];
   firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   setInterval(setTimeElement, 1000);
   setTimeElement();
-  function btnControl() {
-    var n = true;
-    if(player){
-      n = player.isMuted();
-    }else{
-      n = true;
-    }
-    if(n){
-      control.innerText = '🔇';
-      if(player){
-        player.unMute();
-      }
-    }else{
-      control.innerText = '🔊';
-      if(player){
-        player.mute();
-      }
-    }
-  }
-  btnControl();
-  control.onclick = function () {
-    btnControl();
-  }
-  includeIdE();
-  handleInfo()
+  control.onclick = btnControl;
 }
+
 init();
