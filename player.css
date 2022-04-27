@@ -45,13 +45,16 @@ body{
 .down{
   bottom: 0;
 }
+.hide{
+  display: none;
+}
 #radio{
   width: 90%;
 }
 #yt, #start{
   position: absolute;
   left: 0;
-  background: #fff;
+  background: rgb(0, 0, 0);
   z-index: -1;
 }
 .hide{

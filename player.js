@@ -14,10 +14,10 @@ var firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const radioRef = doc(db, 'radio', 'radio');
-
+var itag = 0;
+const itagArray = [22, 18, 140, 249, 338, 250, 251, 327];
 var duration_song = 0;
 var timestampradio = utcTimestamp();
-var player;
 
 var e = document.body.getElementsByTagName("*");
 var i = 0;
@@ -48,20 +48,20 @@ function toHHMMSS(e) {
 
 volume.oninput = function () {
   if(player){
-    player.setVolume(this.value);
+    player.volume = this.value / 100;
   }
 }
 function btnControl() {
   if(!player){
     return;
   }
-  var n = player.isMuted() || true;
+  var n = player.muted || true;
   if(n){
     control.innerText = '🔇';
-    player.unMute();
+    player.muted = false;
   }else{
     control.innerText = '🔊';
-    player.mute();
+    player.muted = true;
   }
 }
 
@@ -70,8 +70,12 @@ function utcTimestamp() {
   return Date.UTC(now.getUTCFullYear(),now.getUTCMonth(), now.getUTCDate(), now.getUTCHours(), now.getUTCMinutes(), now.getUTCSeconds(), now.getUTCMilliseconds());
 }
 
-function handleInfo(doc) {
-  const data = JSON.parse(doc.data().info);
+async function wait (ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function handleInfo(doc) {
+  const data = doc.data().info;
   if(data.title == 'undefined'){
     return;
   }
@@ -81,34 +85,36 @@ function handleInfo(doc) {
     thumbnail.src = data.thumbnail;
   }
   timestampradio = data.timestamp;
-  webpagetitle.innerText = '📻Radio v3 powered ⚡ with SimaBot v' +  data.version;
+  webpagetitle.innerText = '📻 Radio v4 powered ⚡ with SimaBot';
   duration_song = data.time;
   const videoId = new URL(data.url).searchParams.get('v');
-  player.loadVideoById(videoId);
-  player.seekTo(Math.floor(t()));
+  const domain = 'vid.puffyan.us';
+  const url = 'https://' + domain + '/latest_version?id=' + videoId;
+  player.poster = data.thumbnail;
+  player.currentTime = t();
+  for (let i = 0; i < itagArray.length; i++) {
+    const itag = itagArray[i];
+    player.src = url + '&itag=' + itag;
+    try {
+      player.play();
+    } catch (error) {
+  
+    }
+    while (player.readyState == 0) {
+      await wait(500);
+    }
+    if(player.readyState > 3){
+      player.currentTime = t();
+      break;
+    }
+  }
 }
+
+player.addEventListener('pause', (event) => {
+  player.play();
+});
 
 // Optimized code ended
-
-function onPlay(e) {
-  if (e.data != 1) {
-    yt.className = 'novideo';
-  }else{
-    yt.className = 'video';
-  }
-  if(player){
-    player.playVideo();
-  }
-}
-
-window.onYouTubeIframeAPIReady = function () {
-  player = new YT.Player('ytp', {
-    events: {
-      'onReady': onPlay,
-      'onStateChange': onPlay
-    }
-  });
-}
 
 function t() {
   return (utcTimestamp() - timestampradio) / 1000;
@@ -118,18 +124,29 @@ function setTimeElement() {
   time.innerText = '⌛' + toHHMMSS(Number(duration_song)) + ' / ' + toHHMMSS(Math.floor(t()));
 }
 
+var timerControl = null;
+var mousemove = true;
+
 function init() {
-  var tag = document.createElement('script');
   start.onclick = function () {
     start.onclick = null;
     start.className = 'hide';
     getDoc(radioRef).then(handleInfo);
     onSnapshot(radioRef, handleInfo);
   }
-  tag.src = "https://www.youtube.com/iframe_api";
-  var firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   setInterval(setTimeElement, 1000);
+  window.onpointerdown = window.onpointermove = function () {
+    mousemove = true;
+    controlPanel.className = '';
+  }
+  timerControl = setInterval(function () {
+    if (mousemove) {
+      controlPanel.className = '';
+    }else{
+      controlPanel.className = 'hide';
+    }
+    mousemove = false;
+  }, 1000);
   setTimeElement();
   control.onclick = btnControl;
 }
