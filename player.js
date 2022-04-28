@@ -85,29 +85,49 @@ async function handleInfo(doc) {
     thumbnail.src = data.thumbnail;
   }
   timestampradio = data.timestamp;
-  webpagetitle.innerText = '📻 Radio v4 powered ⚡ with SimaBot';
+  webpagetitle.innerText = '📻 Radio v5 (beta) powered ⚡ with SimaBot';
   duration_song = data.time;
   const videoId = new URL(data.url).searchParams.get('v');
   const domain = 'vid.puffyan.us';
-  const url = 'https://' + domain + '/latest_version?id=' + videoId;
+  const url = 'https://' + domain + '/api/v1/videos/' + videoId;
+  const urlVideo = 'https://' + domain + '/latest_version?id=' + videoId;
+  // XHR request
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", url);
+  xhr.addEventListener("load", function () {
+    const response = JSON.parse(xhr.responseText);
+    if(response.error){
+      author.innerText = 'Error: ' + response.error;
+      return;
+    }
+    const formatStreams = response.formatStreams;
+    const itag = formatStreams[formatStreams.length - 1].itag;
+    player.src = urlVideo + '&itag=' + itag;
+    player.play();
+    player.currentTime = t();
+  });
+  xhr.onerror = function () {
+    console.log("Error");
+  };
+  xhr.send();
+  // const url = 'https://' + domain + '/latest_version?id=' + videoId;
   player.poster = data.thumbnail;
-  player.currentTime = t();
-  for (let i = 0; i < itagArray.length; i++) {
-    const itag = itagArray[i];
-    player.src = url + '&itag=' + itag;
-    try {
-      player.play();
-    } catch (error) {
+
+  // for (let i = 0; i < itagArray.length; i++) {
+  //   const itag = itagArray[i];
+  //   try {
+  //     
+  //   } catch (error) {
   
-    }
-    while (player.readyState == 0) {
-      await wait(500);
-    }
-    if(player.readyState > 3){
-      player.currentTime = t();
-      break;
-    }
-  }
+  //   }
+  //   while (player.readyState == 0) {
+  //     await wait(500);
+  //   }
+  //   if(player.readyState > 3){
+  //     player.currentTime = t();
+  //     break;
+  //   }
+  // }
 }
 
 player.addEventListener('pause', (event) => {
